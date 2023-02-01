@@ -1,0 +1,7 @@
+{
+  "appId": "tw.bestian.cart",
+  "appName": "cart-demo",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "www"
+}
