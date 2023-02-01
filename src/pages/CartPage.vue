@@ -1,6 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <q-card class="my-card" v-for="(i, k) in items" :key="k">
+    <q-card class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
       <q-card-section>
         <div class="text-h6 center aligned">{{ i.name }}</div>
         <q-img src="https://i.imgur.com/ADEVjSv.jpg" v-if="k % 2 == 0"
@@ -11,13 +11,9 @@
       <q-card-section class="right aligned">
         $NT{{ i.price }}
       </q-card-section>
-      <q-btn class="full-width" @click="addToCart(i)" v-show="!inCart(i)">
+      <q-btn class="full-width" @click="buy(i)">
         <q-icon name="shopping_cart"></q-icon>
-        Add to Cart
-      </q-btn>
-      <q-btn class="full-width" @click="removeFromCart(i)" v-show="inCart(i)">
-        <q-icon name="delete"></q-icon>
-        Remove
+        Buy Now
       </q-btn>
     </q-card>
   </q-page>
@@ -58,9 +54,6 @@ export default defineComponent({
     },
     addToCart (i) {
       this.$emit('addToCart', i)
-    },
-    removeFromCart (i) {
-      this.$emit('removeFromCart', i)
     }
   }
 });
