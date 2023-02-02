@@ -29,6 +29,7 @@
       <q-list>
         <q-item to="/">Home</q-item>
         <q-item to="/cart">Cart</q-item>
+        <q-item to="/checkout">Checkout</q-item>
 
       </q-list>
     </q-drawer>
@@ -67,8 +68,11 @@ export default defineComponent({
     const token = '';
     const uid = '';
     const photoURL = '';
+    const appID = 127044;
+    const appKey = 'app_pENDXkVEoHhGT8DHLdyTetjnGSYaXCYPz7BDfqO9x9xWPyg4WKk9OQ0kEf5N';
 
     return {
+      appID, appKey,
       me, users, isInApp, user, isLogout,
       email, token, uid, photoURL,
       leftDrawerOpen,
