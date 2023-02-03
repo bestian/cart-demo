@@ -91,6 +91,7 @@ export default defineComponent({
     },
     buy (i) {
       /// 
+      console.log(i)
     },
     pay () {
       TPDirect.card.getPrime(function(result) {
