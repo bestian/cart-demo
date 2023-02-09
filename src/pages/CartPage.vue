@@ -25,7 +25,7 @@ import { defineComponent, ref } from 'vue';
 // import InApp from 'detect-inapp';
 
 export default defineComponent({
-  name: 'IndexPage',
+  name: 'CartPage',
   props: ['me', 'users', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
   setup () {
     const meta = ref<Meta>({
@@ -56,6 +56,7 @@ export default defineComponent({
       this.$emit('addToCart', i)
     },
     buy (i) {
+      this.$router.push('/checkout')
       /// 
     }
   }
