@@ -55,7 +55,7 @@ export default defineComponent({
     addToCart (i) {
       this.$emit('addToCart', i)
     },
-    buy (i) {
+    buy () {
       this.$router.push('/checkout')
       /// 
     }

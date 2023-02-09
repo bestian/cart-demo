@@ -126,6 +126,11 @@ export default defineComponent({
           const token = (credential || {accessToken: null}).accessToken
           // The signed-in user info.
           const user = result.user
+
+          this.uid = user.uid
+
+          console.log(this.uid)
+
           this.updateMe(credential, token, user)
           if (!this.users || !this.users[this.uid]) {
             set(dbRef(db, 'users/' + this.uid), {

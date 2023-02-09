@@ -1,15 +1,11 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page>
 
-    <q-card class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
+    <q-card class='my-card' v-for='(i, k) in items' :key='k' v-show='inCart(i)'>
       <q-card-section>
-        <div class="text-h6 center aligned">{{ i.name }}</div>
-        <q-img src="https://i.imgur.com/ADEVjSv.jpg" v-if="k % 2 == 0"
-      style="height: 170px; max-width: 300px"></q-img>
-        <q-img src="https://i.imgur.com/9g8Snz6.jpg" v-else 
-      style="height: 170px; max-width: 300px"></q-img>
+        <div class='text-h6 center aligned'>{{ i.name }}</div>
       </q-card-section>
-      <q-card-section class="right aligned">
+      <q-card-section class='right aligned'>
         $NT{{ i.price }}
       </q-card-section>
     </q-card>
@@ -18,17 +14,18 @@
 
     <div>
         <label>CardView</label>
-        <div id="cardview-container"></div>
+        <div id='cardview-container'></div>
 
-        <q-btn @click="pay()">支付</q-btn>
+        <q-btn @click='pay()'>支付</q-btn>
     </div>
   </q-page>
 </template>
 
 
-<script lang="ts">
+<script lang='ts'>
 import { Meta } from 'components/models';
 import { defineComponent, ref } from 'vue';
+import { axios } from 'boot/axios'
 // import InApp from 'detect-inapp';
 
 export default defineComponent({
@@ -94,6 +91,9 @@ export default defineComponent({
   methods: {
     countTotal () {
       var ans = 0
+      if (!this.uid || !this.users[this.uid]) {
+        return 0
+      }
       for (let k = 0; k < (this.users[this.uid].cart || []).length; k++) {
         if (this.inCart(this.users[this.uid].cart[k])) {
           ans += this.users[this.uid].cart[k].price
@@ -119,21 +119,47 @@ export default defineComponent({
       console.log(i)
     },
     pay () {
-      TPDirect.card.getPrime(function(result) {
+      TPDirect.card.getPrime((result) => {
           if (result.status !== 0) {
             console.error('getPrime error')
             window.alert('請輸入正確的卡號和日期與安全碼')
             return
           }
           var prime = result.card.prime
+          console.log(result)
           console.log('getPrime success: ' + prime)
+          axios.post('https://cart-demo.bestianhelp.workers.dev/', {
+              'prime': prime,
+              'details':'TapPay Test',
+              'amount': this.countTotal(),
+              'cardholder': {
+                  'phone_number': '+886923456789',
+                  'name': '王小明',
+                  'email': 'LittleMing@Wang.com',
+                  'zip_code': '100',
+                  'address': '台北市天龍區芝麻街1號1樓',
+                  'national_id': 'A123456789'
+              },
+              'remember': true
+          }, {
+            headers: {
+              'content-type': 'text/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       })
     }
   }
 });
 </script>
 
-<style type="text/css">
+<style type='text/css'>
   #cardview-container {
     color: 'rgb(0,0,0)';
     fontSize: '15px';
