@@ -35,7 +35,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :me="me" :uid="uid" :users="users" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart" @removeFromCart="removeFromCart"/>
+      <router-view :me="me" :uid="uid" :users="users" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart" @removeFromCart="removeFromCart" @updateUser="updateUser"/>
     </q-page-container>
   </q-layout>
 </template>
@@ -104,6 +104,14 @@ export default defineComponent({
           console.log('item removed')
         })
       }
+    },
+    updateUser (cart, logs) {
+      set(dbRef(db, 'users/' + this.uid + '/cart'), cart).then(() => {
+        console.log('cart updated')
+      })
+      set(dbRef(db, 'users/' + this.uid + '/logs'), logs).then(() => {
+        console.log('logs updated')
+      })
     },
     updateMe (credential, token, user) {
       this.email = user.providerData[0].email || ''

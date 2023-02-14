@@ -1,22 +1,79 @@
 <template>
   <q-page>
+    <q-list bordered separator>
+      <q-item clickable v-ripple class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
+        <q-item-section>
+        {{ i.name }}($NT{{ i.price }})</q-item-section>
+      </q-item>
+    </q-list>
 
-    <q-card class='my-card' v-for='(i, k) in items' :key='k' v-show='inCart(i)'>
-      <q-card-section>
-        <div class='text-h6 center aligned'>{{ i.name }}</div>
-      </q-card-section>
-      <q-card-section class='right aligned'>
-        $NT{{ i.price }}
-      </q-card-section>
-    </q-card>
+    <br/>
 
-    <div> {{countTotal()}} </div>
+    <div> 總金額：$NT{{countTotal()}} </div>
+
+    <br/>
 
     <div>
-        <label>CardView</label>
-        <div id='cardview-container'></div>
+        <label>付款資訊</label>
 
-        <q-btn @click='pay()'>支付</q-btn>
+        <div id='cardview-container'></div>
+         <q-form
+            class="q-gutter-md"
+          >
+
+            <q-field>
+              <q-input
+                filled
+                v-model="name"
+                label="您的姓名 *"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']"
+              />
+              <q-input
+                filled
+                v-model="phone"
+                label="您的手機號碼 *"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']"
+              />
+              <q-input
+                filled
+                v-model="email1"
+                label="您的Email *"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']"
+              />
+            </q-field>
+
+
+            <q-field>
+              <q-input
+                filled
+                v-model="addr"
+                label="您的地址 *"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']"
+              />
+              <q-input
+                filled
+                v-model="zip"
+                label="郵遞區號 *"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']"
+              />
+              <q-input
+                filled
+                v-model="id"
+                label="您的身份證字號 *"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']"
+              />
+            </q-field>
+
+            <div>
+              <q-btn label="送出" color="primary" @click="pay()"/>
+            </div>
+          </q-form>
     </div>
   </q-page>
 </template>
@@ -35,6 +92,13 @@ export default defineComponent({
     const meta = ref<Meta>({
       totalCount: 1200
     });
+
+    const name = ''
+    const phone = ''
+    const email1 = ''
+    const addr = ''
+    const zip = ''
+    const id = ''
     
     const items = [
       { name: '好東西', price: 1000},
@@ -43,7 +107,7 @@ export default defineComponent({
       { name: '狗東西', price: 4000},
       { name: '鳥東西', price: 10000}
     ]
-    return { meta, items };
+    return { meta, items, name, phone, email1, addr, zip, id };
   },
   mounted () {
     var defaultCardViewStyle = {
@@ -114,11 +178,11 @@ export default defineComponent({
     addToCart (i) {
       this.$emit('addToCart', i)
     },
-    buy (i) {
-      /// 
-      console.log(i)
-    },
     pay () {
+      if (!this.name || !this.email1 || !this.phone || !this.addr || !this.zip || !this.id) {
+        window.alert('請輸入完整的付款資訊')
+        return
+      }
       TPDirect.card.getPrime((result) => {
           if (result.status !== 0) {
             console.error('getPrime error')
@@ -133,22 +197,29 @@ export default defineComponent({
               'details':'TapPay Test',
               'amount': this.countTotal(),
               'cardholder': {
-                  'phone_number': '+886923456789',
-                  'name': '王小明',
-                  'email': 'LittleMing@Wang.com',
-                  'zip_code': '100',
-                  'address': '台北市天龍區芝麻街1號1樓',
-                  'national_id': 'A123456789'
+                  'phone_number': this.phone,
+                  'name': this.name,
+                  'email': this.email1,
+                  'zip_code': this.zip,
+                  'address': this.addr,
+                  'national_id': this.id
               },
               'remember': true
           }, {
             headers: {
-              'content-type': 'text/json',
-              'Access-Control-Allow-Origin': '*'
+              'content-type': 'text/json'
             }
           })
-        .then(function (response) {
+        .then((response) => {
           console.log(response);
+          if (response.data.msg == 'Success') {
+            var logs = (this.users[this.uid].logs || []).concat(this.users[this.uid].cart)
+            var cart = []
+            this.$emit('updateUser', cart, logs)
+            window.alert('交易成功')
+          } else {
+            window.alert('交易失敗，請聯絡客服人員')
+          }
         })
         .catch(function (error) {
           console.log(error);

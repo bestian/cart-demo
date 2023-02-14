@@ -1,21 +1,31 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <q-card class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
-      <q-card-section>
-        <div class="text-h6 center aligned">{{ i.name }}</div>
-        <q-img src="https://i.imgur.com/ADEVjSv.jpg" v-if="k % 2 == 0"
-      style="height: 170px; max-width: 300px"></q-img>
-        <q-img src="https://i.imgur.com/9g8Snz6.jpg" v-else 
-      style="height: 170px; max-width: 300px"></q-img>
-      </q-card-section>
-      <q-card-section class="right aligned">
-        $NT{{ i.price }}
-      </q-card-section>
-      <q-btn class="full-width" @click="buy(i)">
-        <q-icon name="shopping_cart"></q-icon>
-        Buy Now
-      </q-btn>
-    </q-card>
+  <q-page>
+    <q-list bordered separator>
+      <q-item clickable v-ripple class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
+        <q-item-section>
+          <q-img src="https://i.imgur.com/ADEVjSv.jpg" v-if="k % 2 == 0"
+      style="height: 80px; max-width: 60px"></q-img>
+          <q-img src="https://i.imgur.com/9g8Snz6.jpg" v-else 
+      style="height: 80px; max-width: 60px"></q-img>
+        {{ i.name }}($NT{{ i.price }})</q-item-section>
+
+        <q-btn @click="removeFromCart(i)" v-show="inCart(i)">
+          <q-icon name="delete"></q-icon>
+          Remove
+        </q-btn>
+      </q-item>
+    </q-list>
+
+    <br/>
+
+    <div> 總金額：$NT{{countTotal()}} </div>
+
+    <br/>
+
+    <q-btn class="full-width" @click="buy()">
+      <q-icon name="shopping_cart"></q-icon>
+      Buy Now
+    </q-btn>
   </q-page>
 </template>
 
@@ -42,6 +52,18 @@ export default defineComponent({
     return { meta, items };
   },
   methods: {
+    countTotal () {
+      var ans = 0
+      if (!this.uid || !this.users[this.uid]) {
+        return 0
+      }
+      for (let k = 0; k < (this.users[this.uid].cart || []).length; k++) {
+        if (this.inCart(this.users[this.uid].cart[k])) {
+          ans += this.users[this.uid].cart[k].price
+        }
+      }
+      return ans
+    },
     inCart (i) {
       if (!this.uid) {
         return false
@@ -55,9 +77,11 @@ export default defineComponent({
     addToCart (i) {
       this.$emit('addToCart', i)
     },
+    removeFromCart (i) {
+      this.$emit('removeFromCart', i)
+    },
     buy () {
       this.$router.push('/checkout')
-      /// 
     }
   }
 });
