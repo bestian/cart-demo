@@ -13,7 +13,7 @@
 
     <br/>
 
-    <div>
+    <!-- <div>
         <label>付款資訊</label>
 
         <div id='cardview-container'></div>
@@ -74,7 +74,9 @@
               <q-btn label="送出" color="primary" @click="pay()"/>
             </div>
           </q-form>
-    </div>
+    </div> -->
+    <q-btn label="送出" color="primary" @click="ecpay()"/>
+    <div v-html = "form" v-show="form"></div>
   </q-page>
 </template>
 
@@ -93,12 +95,13 @@ export default defineComponent({
       totalCount: 1200
     });
 
-    const name = ''
-    const phone = ''
-    const email1 = ''
-    const addr = ''
-    const zip = ''
-    const id = ''
+    const name = ref('')
+    const phone = ref('')
+    const email1 = ref('')
+    const addr = ref('')
+    const zip = ref('')
+    const id = ref('')
+    const form = ref('')
     
     const items = [
       { name: '好東西', price: 1000},
@@ -107,10 +110,10 @@ export default defineComponent({
       { name: '狗東西', price: 4000},
       { name: '鳥東西', price: 10000}
     ]
-    return { meta, items, name, phone, email1, addr, zip, id };
+    return { form, meta, items, name, phone, email1, addr, zip, id };
   },
   mounted () {
-    var defaultCardViewStyle = {
+    /* var defaultCardViewStyle = {
         color: 'rgb(0,0,0)',
         fontSize: '15px',
         lineHeight: '24px',
@@ -118,7 +121,7 @@ export default defineComponent({
         errorColor: 'red',
         placeholderColor: '',
 
-    }
+    } */
 
     // 帶入第三個參數, config.isUsedCcv 為以下兩種參數代表不同意思
     // false 為 CCV 非必填
@@ -134,7 +137,7 @@ export default defineComponent({
     // 起始遮蔽卡號位元
     // endIndex: Int
     // 結束遮蔽卡號位元
-    TPDirect.card.setup('#cardview-container', defaultCardViewStyle, { 
+    /* TPDirect.card.setup('#cardview-container', defaultCardViewStyle, { 
         isUsedCcv: true,
         // 此設定會顯示卡號輸入正確後，會顯示前六後四碼信用卡卡號
         isMaskCreditCardNumber: true,
@@ -149,8 +152,7 @@ export default defineComponent({
         console.log('good!')
       }
 
-      /*   ... */
-    })
+    }) */
   },
   methods: {
     countTotal () {
@@ -177,6 +179,10 @@ export default defineComponent({
     },
     addToCart (i) {
       this.$emit('addToCart', i)
+    },
+    ecpay () {
+      window.location = ('https://6093qyw829.execute-api.us-east-1.amazonaws.com/pay?des=EcpayPay_Test&name=Good_Items&amount=' + this.countTotal()
+      )
     },
     pay () {
       if (!this.name || !this.email1 || !this.phone || !this.addr || !this.zip || !this.id) {
