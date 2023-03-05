@@ -42,6 +42,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import InApp from 'detect-inapp';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useDatabase, useDatabaseObject, useFirebaseAuth } from 'vuefire'
 import { ref as dbRef } from 'firebase/database'
@@ -57,19 +58,19 @@ export default defineComponent({
   name: 'MainLayout',
 
   setup () {
+    const inapp = new InApp(navigator.userAgent || navigator.vendor);
+    const isInApp = ref(inapp.isInApp);
     const leftDrawerOpen = ref(false)
-
-    const users = useDatabaseObject(dbRef(db, 'users'))
-    const me = {}
+    const users = ref(useDatabaseObject(dbRef(db, 'users')))
+    const me = ref({})
     const isLogout = ref<IsLogout>(true)
-    const isInApp = false// new InApp(( navigator.userAgentData && navigator.userAgentData.brands && navigator.userAgentData.brands[0] && navigator.userAgentData.brands[0].brand) || navigator.userAgent || navigator.vendor);
-    const user = {};
-    const email = '';
-    const token = '';
-    const uid = '';
-    const photoURL = '';
-    const appID = 127044;
-    const appKey = 'app_pENDXkVEoHhGT8DHLdyTetjnGSYaXCYPz7BDfqO9x9xWPyg4WKk9OQ0kEf5N';
+    const user = ref({});
+    const email = ref('');
+    const token = ref('');
+    const uid = ref('');
+    const photoURL = ref('');
+    const appID = ref(127044);
+    const appKey = ref('app_pENDXkVEoHhGT8DHLdyTetjnGSYaXCYPz7BDfqO9x9xWPyg4WKk9OQ0kEf5N');
 
     return {
       appID, appKey,
