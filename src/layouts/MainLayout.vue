@@ -150,7 +150,7 @@ export default defineComponent({
               email: this.email,
               photoURL: this.photoURL,
               cart: [],
-              paid: []
+              logs: []
             })
           }
           get(dbRef(db, 'users/' + this.uid)).then((snapshot) => {
