@@ -45,8 +45,7 @@ import { defineComponent, ref } from 'vue';
 import InApp from 'detect-inapp';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useDatabase, useFirebaseAuth } from 'vuefire'
-import { ref as dbRef } from 'firebase/database'
-import { set } from 'firebase/database'
+import { ref as dbRef, set, get } from 'firebase/database'
 
 const db = useDatabase()
 const auth = useFirebaseAuth()
