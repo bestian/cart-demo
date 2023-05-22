@@ -16,8 +16,8 @@
         </q-toolbar-title>
         <p class="hidden">{{isLogout}}</p>
         <q-btn color="orange" v-show = "!uid" @click="loginGoogle()"><q-icon name="ion-logo-google"></q-icon>Login</q-btn>
-        <q-btn color="orange" v-show = "uid" @click="logout()"><q-icon name="ion-logo-google"></q-icon>Logout</q-btn>
         <q-img loading="eager" class="avatar" v-show="photoURL" alt="photo" referrerpolicy="no-referrer" :src="photoURL" :key="photoURL"></q-img> 
+        <q-btn color="orange" v-show = "uid" @click="logout()"><q-icon name="ion-logo-google"></q-icon>Logout</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -35,7 +35,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :me="me" :uid="uid" :users="users" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart" @removeFromCart="removeFromCart" @updateUser="updateUser"/>
+      <router-view :me="me" :uid="uid" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart" @removeFromCart="removeFromCart" @updateUser="updateUser"/>
     </q-page-container>
   </q-layout>
 </template>
@@ -44,7 +44,7 @@
 import { defineComponent, ref } from 'vue';
 import InApp from 'detect-inapp';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { useDatabase, useDatabaseObject, useFirebaseAuth } from 'vuefire'
+import { useDatabase, useFirebaseAuth } from 'vuefire'
 import { ref as dbRef } from 'firebase/database'
 import { set } from 'firebase/database'
 
@@ -61,10 +61,16 @@ export default defineComponent({
     const inapp = new InApp(navigator.userAgent || navigator.vendor);
     const isInApp = ref(inapp.isInApp);
     const leftDrawerOpen = ref(false)
-    const users = ref(useDatabaseObject(dbRef(db, 'users')))
-    const me = ref({})
     const isLogout = ref<IsLogout>(true)
-    const user = ref({});
+
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    const obj1:any = {};
+    const me = ref(obj1);
+
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    const obj2:any = {};
+    const user = ref(obj2);
+
     const email = ref('');
     const token = ref('');
     const uid = ref('');
@@ -74,7 +80,7 @@ export default defineComponent({
 
     return {
       appID, appKey,
-      me, users, isInApp, user, isLogout,
+      me, isInApp, user, isLogout,
       email, token, uid, photoURL,
       leftDrawerOpen,
       toggleLeftDrawer () {
@@ -87,7 +93,7 @@ export default defineComponent({
       if (!this.uid) {
         window.alert('Please Login at first')
       } else {
-        var arr = this.users[this.uid].cart || []
+        var arr = this.me.cart || []
         arr.push(i)
         set(dbRef(db, 'users/' + this.uid + '/cart'), arr).then(() => {
           console.log('item added')
@@ -98,7 +104,7 @@ export default defineComponent({
       if (!this.uid) {
         window.alert('Please Login at first')
       } else {
-        var arr = (this.users[this.uid].cart || []).filter(function (o) {
+        var arr = (this.me.cart || []).filter(function (o) {
           return o.name !== i.name
         })
         set(dbRef(db, 'users/' + this.uid + '/cart'), arr).then(() => {
@@ -114,15 +120,11 @@ export default defineComponent({
         console.log('logs updated')
       })
     },
-    updateMe (credential, token, user) {
+    updatePhotoURL (user, token) {
       this.email = user.providerData[0].email || ''
       this.token = token || ''
       this.uid = user.uid
       this.photoURL = decodeURI(user.photoURL || '')
-      this.isLogout = true
-      this.isLogout = false
-      this.me = this.users[this.uid] || {}
-      this.$forceUpdate()
     },
     loginGoogle () {
       this.isLogout = false
@@ -133,31 +135,42 @@ export default defineComponent({
           // This gives you a Google Access Token. You can use it to access the Google API.
           const credential = GoogleAuthProvider.credentialFromResult(result)
           const token = (credential || {accessToken: null}).accessToken
+
+          console.log(token)
           // The signed-in user info.
           const user = result.user
-
+          this.user = user
           this.uid = user.uid
 
-          console.log(this.uid)
+          this.updatePhotoURL(user, token)
 
-          this.updateMe(credential, token, user)
-          if (!this.users || !this.users[this.uid]) {
+          if (!this.users || !this.me) {
             set(dbRef(db, 'users/' + this.uid), {
               id: this.uid,
-              email: this.email
+              email: this.email,
+              photoURL: this.photoURL,
+              cart: [],
+              paid: []
             })
           }
-        }).catch((error) => {
+          get(dbRef(db, 'users/' + this.uid)).then((snapshot) => {
+            if (snapshot.exists()) {
+              console.log('get user data');
+              const m = snapshot.val();
+              this.me = m
+            }
+          }).catch((error) => {
           // Handle Errors here.
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // The email of the user's account used.
-          // const email = error.customData.email;
-          // The AuthCredential type that was used.
-          // const credential = GoogleAuthProvider.credentialFromError(error);
-          console.log(errorCode)
-          console.log(errorMessage)
-        });
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            // const email = error.customData.email;
+            // The AuthCredential type that was used.
+            // const credential = GoogleAuthProvider.credentialFromError(error);
+            console.log(errorCode)
+            console.log(errorMessage)
+          });
+        })
       }
     },
     logout () {

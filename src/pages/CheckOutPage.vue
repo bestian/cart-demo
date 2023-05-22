@@ -89,7 +89,7 @@ import { axios } from 'boot/axios'
 
 export default defineComponent({
   name: 'CheckOutPage',
-  props: ['me', 'users', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
+  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
   setup () {
     const meta = ref<Meta>({
       totalCount: 1200
@@ -157,12 +157,12 @@ export default defineComponent({
   methods: {
     countTotal () {
       var ans = 0
-      if (!this.uid || !this.users[this.uid]) {
+      if (!this.uid || !this.me) {
         return 0
       }
-      for (let k = 0; k < (this.users[this.uid].cart || []).length; k++) {
-        if (this.inCart(this.users[this.uid].cart[k])) {
-          ans += this.users[this.uid].cart[k].price
+      for (let k = 0; k < (this.me.cart || []).length; k++) {
+        if (this.inCart(this.me.cart[k])) {
+          ans += this.me.cart[k].price
         }
       }
       return ans
@@ -171,7 +171,7 @@ export default defineComponent({
       if (!this.uid) {
         return false
       } else {
-        var arr = (this.users[this.uid].cart || []).filter(function (o) {
+        var arr = (this.me.cart || []).filter(function (o) {
           return o.name === i.name
         })
         return arr.length > 0
@@ -219,7 +219,7 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           if (response.data.msg == 'Success') {
-            var logs = (this.users[this.uid].logs || []).concat(this.users[this.uid].cart)
+            var logs = (this.me.logs || []).concat(this.me.cart)
             var cart = []
             this.$emit('updateUser', cart, logs)
             window.alert('交易成功')

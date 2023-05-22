@@ -30,7 +30,7 @@ import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'IndexPage',
-  props: ['me', 'users', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
+  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
   setup () {
     const meta = ref<Meta>({
       totalCount: 1200
@@ -50,7 +50,7 @@ export default defineComponent({
       if (!this.uid) {
         return false
       } else {
-        var arr = (this.users[this.uid].cart || []).filter(function (o) {
+        var arr = (this.me.cart || []).filter(function (o) {
           return o.name === i.name
         })
         return arr.length > 0
