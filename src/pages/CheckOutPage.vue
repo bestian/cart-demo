@@ -113,7 +113,7 @@ export default defineComponent({
     return { form, meta, items, name, phone, email1, addr, zip, id };
   },
   mounted () {
-    /* var defaultCardViewStyle = {
+    const var defaultCardViewStyle = {
         color: 'rgb(0,0,0)',
         fontSize: '15px',
         lineHeight: '24px',
@@ -121,7 +121,7 @@ export default defineComponent({
         errorColor: 'red',
         placeholderColor: '',
 
-    } */
+    }
 
     // 帶入第三個參數, config.isUsedCcv 為以下兩種參數代表不同意思
     // false 為 CCV 非必填
@@ -137,7 +137,7 @@ export default defineComponent({
     // 起始遮蔽卡號位元
     // endIndex: Int
     // 結束遮蔽卡號位元
-    /* TPDirect.card.setup('#cardview-container', defaultCardViewStyle, { 
+    TPDirect.card.setup('#cardview-container', defaultCardViewStyle, { 
         isUsedCcv: true,
         // 此設定會顯示卡號輸入正確後，會顯示前六後四碼信用卡卡號
         isMaskCreditCardNumber: true,
@@ -152,7 +152,7 @@ export default defineComponent({
         console.log('good!')
       }
 
-    }) */
+    })
   },
   methods: {
     countTotal () {
