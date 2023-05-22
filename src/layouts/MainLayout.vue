@@ -158,6 +158,15 @@ export default defineComponent({
               console.log('get user data');
               const m = snapshot.val();
               this.me = m
+              this.isLogout = false
+            } else {
+              this.me = {
+                id: this.uid,
+                email: this.email,
+                photoURL: this.photoURL,
+                cart: [],
+                logs: []
+              }
             }
           }).catch((error) => {
           // Handle Errors here.
