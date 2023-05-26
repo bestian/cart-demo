@@ -91,7 +91,6 @@
 
 
 <script lang='ts'>
-import { Meta } from 'components/models';
 import { defineComponent, ref } from 'vue';
 import { axios } from 'boot/axios'
 // import InApp from 'detect-inapp';
