@@ -21,8 +21,7 @@
 </template>
 
 <script lang="ts">
-import { Meta } from 'components/models';
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 // import InApp from 'detect-inapp';
 
 export default defineComponent({
