@@ -35,7 +35,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :me="me" :uid="uid" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart" @removeFromCart="removeFromCart" @updateUser="updateUser"/>
+      <router-view :me="me" :uid="uid" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart" @removeFromCart="removeFromCart" @updateUser="updateUser" :items="items"/>
     </q-page-container>
   </q-layout>
 </template>
@@ -44,7 +44,7 @@
 import { defineComponent, ref } from 'vue';
 import InApp from 'detect-inapp';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { useDatabase, useFirebaseAuth } from 'vuefire'
+import { useDatabase, useFirebaseAuth, useDatabaseList } from 'vuefire'
 import { ref as dbRef, set, get } from 'firebase/database'
 
 const db = useDatabase()
@@ -77,8 +77,10 @@ export default defineComponent({
     const appID = ref(127044);
     const appKey = ref('app_pENDXkVEoHhGT8DHLdyTetjnGSYaXCYPz7BDfqO9x9xWPyg4WKk9OQ0kEf5N');
 
+    const items = ref(useDatabaseList(dbRef(db, 'items')))
+
     return {
-      appID, appKey,
+      appID, appKey, items,
       me, isInApp, user, isLogout,
       email, token, uid, photoURL,
       leftDrawerOpen,
@@ -126,7 +128,6 @@ export default defineComponent({
       this.photoURL = decodeURI(user.photoURL || '')
     },
     loginGoogle () {
-      this.isLogout = false
       if (this.isInApp) {
         window.alert('本系統不支援facebook, line等app內部瀏覽，請用一般瀏覽器開啟，方可登入，謝謝')
       } else {
@@ -135,46 +136,56 @@ export default defineComponent({
           const credential = GoogleAuthProvider.credentialFromResult(result)
           const token = (credential || {accessToken: null}).accessToken
 
-          console.log(token)
+          // console.log(token)
           // The signed-in user info.
           const user = result.user
+
           this.user = user
           this.uid = user.uid
 
+          this.isLogout = false
+
           this.updatePhotoURL(user, token)
 
-          if (!this.users || !this.me) {
-            set(dbRef(db, 'users/' + this.uid), {
-              id: this.uid,
-              email: this.email,
-              photoURL: this.photoURL,
-              cart: [],
-              logs: []
-            })
-          }
           get(dbRef(db, 'users/' + this.uid)).then((snapshot) => {
             if (snapshot.exists()) {
               console.log('get user data');
               const m = snapshot.val();
               this.me = m
+
+              set(dbRef(db, 'users/' + this.uid + '/cart'), this.cart)
+
+              // this.cart = [...this.me.cart || [] ]; // 取代
+
               this.isLogout = false
             } else {
               this.me = {
                 id: this.uid,
                 email: this.email,
                 photoURL: this.photoURL,
-                cart: [],
+                cart: this.cart,
                 logs: []
               }
+
+              console.log(this.uid)         
+              set(dbRef(db, 'users/' + this.uid), {
+                id: this.uid,
+                email: this.email,
+                photoURL: this.photoURL,
+                cart: [],
+                logs: []
+              }).then( () => {
+                console.log('user created!')
+              }).catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode)
+                console.log(errorMessage)
+              });
             }
           }).catch((error) => {
-          // Handle Errors here.
             const errorCode = error.code;
             const errorMessage = error.message;
-            // The email of the user's account used.
-            // const email = error.customData.email;
-            // The AuthCredential type that was used.
-            // const credential = GoogleAuthProvider.credentialFromError(error);
             console.log(errorCode)
             console.log(errorMessage)
           });

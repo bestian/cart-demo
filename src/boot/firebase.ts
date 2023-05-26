@@ -6,13 +6,14 @@ import { VueFire, VueFireAuth } from 'vuefire'
 
 // Get a Firestore instance
 export const firebaseApp = initializeApp({
-  apiKey: 'AIzaSyADI3q1K1tKzsjPstpJoeDS9tRQpeidaOo',
-  authDomain: 'cart-demo-f2340.firebaseapp.com',
-  projectId: 'cart-demo-f2340',
-  storageBucket: 'cart-demo-f2340.appspot.com',
-  messagingSenderId: '1055844402423',
-  appId: '1:1055844402423:web:a42ceee1fa2dfb96ddfff2',
-  measurementId: 'G-YZD66T2PR1'
+  apiKey: 'AIzaSyCoY777ID9SQqz7UPyjha9YRycO2Y56bZ8',
+  authDomain: 'payment-demo-14e75.firebaseapp.com',
+  databaseURL: 'https://payment-demo-14e75-default-rtdb.firebaseio.com',
+  projectId: 'payment-demo-14e75',
+  storageBucket: 'payment-demo-14e75.appspot.com',
+  messagingSenderId: '202896970342',
+  appId: '1:202896970342:web:45fcadb0655ffc7c0bd3a7',
+  measurementId: 'G-LSNJMNJM2F'
 });
 
 

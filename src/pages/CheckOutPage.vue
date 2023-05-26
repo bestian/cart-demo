@@ -1,82 +1,91 @@
 <template>
   <q-page>
     <q-list bordered separator>
-      <q-item clickable v-ripple class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
+      <q-item  class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
         <q-item-section>
-        {{ i.name }}($NT{{ i.price }})</q-item-section>
+          {{ i.name }}($NT{{ i.price }})
+        </q-item-section>
+      </q-item>
+    </q-list>
+
+    <br/>
+    <br/>
+
+    <q-list bordered separator>
+      <q-item> 
+        <q-item-section>
+          總金額：$NT{{countTotal()}}
+        </q-item-section>
       </q-item>
     </q-list>
 
     <br/>
 
-    <div> 總金額：$NT{{countTotal()}} </div>
+    <div class="q-pa-md" v-show="uid">
 
-    <br/>
+    <label>付款資訊</label>
 
-    <!-- <div>
-        <label>付款資訊</label>
+    <div id='cardview-container'></div>
+     <q-form
+        class="q-gutter-md"
+      >
 
-        <div id='cardview-container'></div>
-         <q-form
-            class="q-gutter-md"
-          >
-
-            <q-field>
-              <q-input
-                filled
-                v-model="name"
-                label="您的姓名 *"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
-              />
-              <q-input
-                filled
-                v-model="phone"
-                label="您的手機號碼 *"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
-              />
-              <q-input
-                filled
-                v-model="email1"
-                label="您的Email *"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
-              />
-            </q-field>
+        <q-field>
+          <q-input
+            filled
+            v-model="name"
+            label="您的姓名 *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+          <q-input
+            filled
+            v-model="phone"
+            label="您的手機號碼 *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+          <q-input
+            filled
+            v-model="email1"
+            label="您的Email *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+        </q-field>
 
 
-            <q-field>
-              <q-input
-                filled
-                v-model="addr"
-                label="您的地址 *"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
-              />
-              <q-input
-                filled
-                v-model="zip"
-                label="郵遞區號 *"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
-              />
-              <q-input
-                filled
-                v-model="id"
-                label="您的身份證字號 *"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']"
-              />
-            </q-field>
+        <q-field>
+          <q-input
+            filled
+            v-model="addr"
+            label="您的地址 *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+          <q-input
+            filled
+            v-model="zip"
+            label="郵遞區號 *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+          <q-input
+            filled
+            v-model="id"
+            label="您的身份證字號 *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+        </q-field>
 
-            <div>
-              <q-btn label="送出" color="primary" @click="pay()"/>
-            </div>
-          </q-form>
-    </div> -->
-    <q-btn label="送出" color="primary" @click="ecpay()"/>
-    <div v-html = "form" v-show="form"></div>
+        <div>
+          <q-btn label="送出" color="primary" @click="pay()"/>
+        </div>
+      </q-form>
+    </div>
+    <!-- <q-btn label="送出" color="primary" @click="ecpay()"/>
+    <div v-html = "form" v-show="form"></div> -->
   </q-page>
 </template>
 
@@ -89,11 +98,8 @@ import { axios } from 'boot/axios'
 
 export default defineComponent({
   name: 'CheckOutPage',
-  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
+  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp', 'items'],
   setup () {
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
 
     const name = ref('')
     const phone = ref('')
@@ -103,17 +109,10 @@ export default defineComponent({
     const id = ref('')
     const form = ref('')
     
-    const items = [
-      { name: '好東西', price: 1000},
-      { name: '棒東西', price: 2000},
-      { name: '壞東西', price: 6000},
-      { name: '狗東西', price: 4000},
-      { name: '鳥東西', price: 10000}
-    ]
-    return { form, meta, items, name, phone, email1, addr, zip, id };
+    return { form, name, phone, email1, addr, zip, id };
   },
   mounted () {
-    const var defaultCardViewStyle = {
+    const defaultCardViewStyle = {
         color: 'rgb(0,0,0)',
         fontSize: '15px',
         lineHeight: '24px',
@@ -198,12 +197,14 @@ export default defineComponent({
           var prime = result.card.prime
           console.log(result)
           console.log('getPrime success: ' + prime)
-          axios.post('https://cart-demo.bestianhelp.workers.dev/', {
+          axios.post('https://payment-demo.bestian123.workers.dev/', 
+            {
               'prime': prime,
-              'details':'TapPay Test',
+              'details':'TapPay Test:',
+              'items': (this.me.cart || []),
               'amount': this.countTotal(),
               'cardholder': {
-                  'phone_number': this.phone,
+                  'phone_number': String(this.phone),
                   'name': this.name,
                   'email': this.email1,
                   'zip_code': this.zip,

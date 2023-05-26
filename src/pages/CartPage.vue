@@ -3,10 +3,7 @@
     <q-list bordered separator>
       <q-item clickable v-ripple class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
         <q-item-section>
-          <q-img src="https://i.imgur.com/ADEVjSv.jpg" v-if="k % 2 == 0"
-      style="height: 80px; max-width: 60px"></q-img>
-          <q-img src="https://i.imgur.com/9g8Snz6.jpg" v-else 
-      style="height: 80px; max-width: 60px"></q-img>
+          <q-img :src="i.img"></q-img>
         {{ i.name }}($NT{{ i.price }})</q-item-section>
 
         <q-btn @click="removeFromCart(i)" v-show="inCart(i)">
@@ -36,20 +33,9 @@ import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'CartPage',
-  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
+  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp', 'items'],
   setup () {
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
-    
-    const items = [
-      { name: '好東西', price: 1000},
-      { name: '棒東西', price: 2000},
-      { name: '壞東西', price: 6000},
-      { name: '狗東西', price: 4000},
-      { name: '鳥東西', price: 10000}
-    ]
-    return { meta, items };
+    return {  };
   },
   methods: {
     countTotal () {

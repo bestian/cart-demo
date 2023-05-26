@@ -3,10 +3,7 @@
     <q-card class="my-card" v-for="(i, k) in items" :key="k">
       <q-card-section>
         <div class="text-h6 center aligned">{{ i.name }}</div>
-        <q-img src="https://i.imgur.com/ADEVjSv.jpg" v-if="k % 2 == 0"
-      style="height: 170px; max-width: 300px"></q-img>
-        <q-img src="https://i.imgur.com/9g8Snz6.jpg" v-else 
-      style="height: 170px; max-width: 300px"></q-img>
+        <q-img :src="i.img"></q-img>
       </q-card-section>
       <q-card-section class="right aligned">
         $NT{{ i.price }}
@@ -30,23 +27,13 @@ import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'IndexPage',
-  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp'],
+  props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp', 'items'],
   setup () {
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
-    
-    const items = [
-      { name: '好東西', price: 1000},
-      { name: '棒東西', price: 2000},
-      { name: '壞東西', price: 6000},
-      { name: '狗東西', price: 4000},
-      { name: '鳥東西', price: 10000}
-    ]
-    return { meta, items };
+    return {  };
   },
   methods: {
     inCart (i) {
+      console.log(this.me.cart)
       if (!this.uid) {
         return false
       } else {
