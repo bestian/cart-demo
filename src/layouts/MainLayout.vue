@@ -36,6 +36,7 @@
         <q-item to="/">Home</q-item>
         <q-item to="/cart">Cart</q-item>
         <q-item to="/checkout">Checkout</q-item>
+        <q-item to="/source">Source</q-item>
       </q-list>
     </q-drawer>
 
