@@ -1,6 +1,7 @@
 # cart-demo (cart-demo)
 
-Cart_Demo
+一個簡易的Quasar範例專案，裡面有購物車
+其中信用卡付款是測試模式，不是真的
 
 ## Install the dependencies
 ```bash
