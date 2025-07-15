@@ -1,86 +1,55 @@
 <template>
   <q-page>
+    <h1>付款頁面(TapPay, 測試環境)</h1>
     <q-list bordered separator>
-      <q-item  class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
+      <q-item class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
         <q-item-section>
           {{ i.name }}($NT{{ i.price }})
         </q-item-section>
       </q-item>
     </q-list>
 
-    <br/>
-    <br/>
+    <br />
+    <br />
 
     <q-list bordered separator>
-      <q-item> 
+      <q-item>
         <q-item-section>
-          總金額：$NT{{countTotal()}}
+          總金額：$NT{{ countTotal() }}
         </q-item-section>
       </q-item>
     </q-list>
 
-    <br/>
+    <br />
 
     <div class="q-pa-md" v-show="uid">
 
-    <label>付款資訊</label>
+      <label>付款資訊</label>
 
-    <div id='cardview-container'></div>
-     <q-form
-        class="q-gutter-md"
-      >
+      <div id='cardview-container'></div>
+      <q-form class="q-gutter-md">
 
         <q-field>
-          <q-input
-            filled
-            v-model="name"
-            label="您的姓名 *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="phone"
-            label="您的手機號碼 *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="email1"
-            label="您的Email *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
+          <q-input filled v-model="name" label="您的姓名 *" lazy-rules
+            :rules="[val => val && val.length > 0 || 'Please type something']" />
+          <q-input filled v-model="phone" label="您的手機號碼 *" lazy-rules
+            :rules="[val => val && val.length > 0 || 'Please type something']" />
+          <q-input filled v-model="email1" label="您的Email *" lazy-rules
+            :rules="[val => val && val.length > 0 || 'Please type something']" />
         </q-field>
 
 
         <q-field>
-          <q-input
-            filled
-            v-model="addr"
-            label="您的地址 *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="zip"
-            label="郵遞區號 *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="id"
-            label="您的身份證字號 *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
+          <q-input filled v-model="addr" label="您的地址 *" lazy-rules
+            :rules="[val => val && val.length > 0 || 'Please type something']" />
+          <q-input filled v-model="zip" label="郵遞區號 *" lazy-rules
+            :rules="[val => val && val.length > 0 || 'Please type something']" />
+          <q-input filled v-model="id" label="您的身份證字號 *" lazy-rules
+            :rules="[val => val && val.length > 0 || 'Please type something']" />
         </q-field>
 
         <div>
-          <q-btn label="送出" color="primary" @click="pay()"/>
+          <q-btn label="送出" color="primary" @click="pay()" />
         </div>
       </q-form>
     </div>
@@ -98,7 +67,7 @@ import { axios } from 'boot/axios'
 export default defineComponent({
   name: 'CheckOutPage',
   props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp', 'items'],
-  setup () {
+  setup() {
 
     const name = ref('')
     const phone = ref('')
@@ -107,17 +76,17 @@ export default defineComponent({
     const zip = ref('')
     const id = ref('')
     const form = ref('')
-    
+
     return { form, name, phone, email1, addr, zip, id };
   },
-  mounted () {
+  mounted() {
     const defaultCardViewStyle = {
-        color: 'rgb(0,0,0)',
-        fontSize: '15px',
-        lineHeight: '24px',
-        fontWeight: '300',
-        errorColor: 'red',
-        placeholderColor: '',
+      color: 'rgb(0,0,0)',
+      fontSize: '15px',
+      lineHeight: '24px',
+      fontWeight: '300',
+      errorColor: 'red',
+      placeholderColor: '',
 
     }
 
@@ -135,17 +104,17 @@ export default defineComponent({
     // 起始遮蔽卡號位元
     // endIndex: Int
     // 結束遮蔽卡號位元
-    TPDirect.card.setup('#cardview-container', defaultCardViewStyle, { 
-        isUsedCcv: true,
-        // 此設定會顯示卡號輸入正確後，會顯示前六後四碼信用卡卡號
-        isMaskCreditCardNumber: true,
-        maskCreditCardNumberRange: {
-            beginIndex: 6, 
-            endIndex: 11
-        }
+    TPDirect.card.setup('#cardview-container', defaultCardViewStyle, {
+      isUsedCcv: true,
+      // 此設定會顯示卡號輸入正確後，會顯示前六後四碼信用卡卡號
+      isMaskCreditCardNumber: true,
+      maskCreditCardNumberRange: {
+        beginIndex: 6,
+        endIndex: 11
+      }
     })
 
-    TPDirect.card.onUpdate(function(update){
+    TPDirect.card.onUpdate(function (update) {
       if (update.canGetPrime) {
         console.log('good!')
       }
@@ -153,7 +122,7 @@ export default defineComponent({
     })
   },
   methods: {
-    countTotal () {
+    countTotal() {
       var ans = 0
       if (!this.uid || !this.me) {
         return 0
@@ -165,7 +134,7 @@ export default defineComponent({
       }
       return ans
     },
-    inCart (i) {
+    inCart(i) {
       if (!this.uid) {
         return false
       } else {
@@ -175,61 +144,61 @@ export default defineComponent({
         return arr.length > 0
       }
     },
-    addToCart (i) {
+    addToCart(i) {
       this.$emit('addToCart', i)
     },
-    ecpay () {
+    ecpay() {
       window.location = ('https://6093qyw829.execute-api.us-east-1.amazonaws.com/pay?des=EcpayPay_Test&name=Good_Items&amount=' + this.countTotal()
       )
     },
-    pay () {
+    pay() {
       if (!this.name || !this.email1 || !this.phone || !this.addr || !this.zip || !this.id) {
         window.alert('請輸入完整的付款資訊')
         return
       }
       TPDirect.card.getPrime((result) => {
-          if (result.status !== 0) {
-            console.error('getPrime error')
-            window.alert('請輸入正確的卡號和日期與安全碼')
-            return
-          }
-          var prime = result.card.prime
-          console.log(result)
-          console.log('getPrime success: ' + prime)
-          axios.post('https://payment-demo.bestian123.workers.dev/', 
-            {
-              'prime': prime,
-              'details':'TapPay Test:',
-              'items': (this.me.cart || []),
-              'amount': this.countTotal(),
-              'cardholder': {
-                  'phone_number': String(this.phone),
-                  'name': this.name,
-                  'email': this.email1,
-                  'zip_code': this.zip,
-                  'address': this.addr,
-                  'national_id': this.id
-              },
-              'remember': true
+        if (result.status !== 0) {
+          console.error('getPrime error')
+          window.alert('請輸入正確的卡號和日期與安全碼')
+          return
+        }
+        var prime = result.card.prime
+        console.log(result)
+        console.log('getPrime success: ' + prime)
+        axios.post('https://payment-demo.bestian123.workers.dev/',
+          {
+            'prime': prime,
+            'details': 'TapPay Test:',
+            'items': (this.me.cart || []),
+            'amount': this.countTotal(),
+            'cardholder': {
+              'phone_number': String(this.phone),
+              'name': this.name,
+              'email': this.email1,
+              'zip_code': this.zip,
+              'address': this.addr,
+              'national_id': this.id
+            },
+            'remember': true
           }, {
-            headers: {
-              'content-type': 'text/json'
-            }
-          })
-        .then((response) => {
-          console.log(response);
-          if (response.data.msg == 'Success') {
-            var logs = (this.me.logs || []).concat(this.me.cart)
-            var cart = []
-            this.$emit('updateUser', cart, logs)
-            window.alert('交易成功')
-          } else {
-            window.alert('交易失敗，請聯絡客服人員')
+          headers: {
+            'content-type': 'text/json'
           }
         })
-        .catch(function (error) {
-          console.log(error);
-        });
+          .then((response) => {
+            console.log(response);
+            if (response.data.msg == 'Success') {
+              var logs = (this.me.logs || []).concat(this.me.cart)
+              var cart = []
+              this.$emit('updateUser', cart, logs)
+              window.alert('交易成功')
+            } else {
+              window.alert('交易失敗，請聯絡客服人員')
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       })
     }
   }
@@ -237,13 +206,13 @@ export default defineComponent({
 </script>
 
 <style type='text/css'>
-  #cardview-container {
-    color: 'rgb(0,0,0)';
-    fontSize: '15px';
-    lineHeight: '24px';
-    fontWeight: '300';
-    errorColor: 'red';
-    placeholderColor: '';
-    width: 400px;
-  }
+#cardview-container {
+  color: 'rgb(0,0,0)';
+  fontSize: '15px';
+  lineHeight: '24px';
+  fontWeight: '300';
+  errorColor: 'red';
+  placeholderColor: '';
+  width: 400px;
+}
 </style>

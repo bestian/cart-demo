@@ -1,27 +1,42 @@
 // app global css in SCSS form
 
 .right.aligned {
-	text-align: right;
+  text-align: right;
 }
 
 .center.aligned {
-	text-align: center;
+  text-align: center;
 }
 
 .q-img__image {
-	border-radius: 30px;
+  border-radius: 30px;
 }
 
 .avatar {
-	width: 26px;
-	height: 26px;
-	border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
 }
 
 .hidden {
-	visibility: hidden;
+  visibility: hidden;
 }
 
 .q-card {
-	width: 160px;
+  width: 160px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: bold;
 }
