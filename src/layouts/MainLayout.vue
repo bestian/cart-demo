@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import InApp from 'detect-inapp';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, Auth } from 'firebase/auth';
 import { useDatabase, useFirebaseAuth, useDatabaseList } from 'vuefire';
 import { ref as dbRef, set, get } from 'firebase/database';
 
@@ -90,7 +90,7 @@ export default defineComponent({
     };
   },
   methods: {
-    addToCart(i) {
+    addToCart(i: any) {
       if (!this.uid) {
         window.alert('Please Login at first');
       } else {
@@ -131,7 +131,7 @@ export default defineComponent({
         });
       }
     },
-    updateUser(cart, logs) {
+    updateUser(cart: any, logs: any) {
       set(dbRef(db, 'users/' + this.uid + '/cart'), cart).then(() => {
         console.log('cart updated');
       });
@@ -139,7 +139,7 @@ export default defineComponent({
         console.log('logs updated');
       });
     },
-    updatePhotoURL(user, token) {
+    updatePhotoURL(user: any, token: any) {
       this.email = user.providerData[0].email || '';
       this.token = token || '';
       this.uid = user.uid;
@@ -151,7 +151,7 @@ export default defineComponent({
           '本系統不支援facebook, line等app內部瀏覽，請用一般瀏覽器開啟，方可登入，謝謝'
         );
       } else {
-        signInWithPopup(auth, provider).then((result) => {
+        signInWithPopup(auth as Auth, provider).then((result) => {
           // This gives you a Google Access Token. You can use it to access the Google API.
           const credential = GoogleAuthProvider.credentialFromResult(result);
           const token = (credential || { accessToken: null }).accessToken;
@@ -218,29 +218,31 @@ export default defineComponent({
     },
     logout() {
       this.isLogout = true;
-      auth
-        .signOut()
-        .then(() => {
-          this.user = {};
-          this.uid = '';
-          this.photoURL = '';
-          this.me = {};
-          console.log('user logout');
-          this.isLogout = false;
-          this.isLogout = true;
-          this.$forceUpdate();
-        })
-        .catch((error) => {
-          // Handle Errors here.
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // The email of the user's account used.
-          // const email = error.customData.email;
-          // The AuthCredential type that was used.
-          // const credential = GoogleAuthProvider.credentialFromError(error);
-          console.log(errorCode);
-          console.log(errorMessage);
-        });
+      if (auth) {
+        auth
+          .signOut()
+          .then(() => {
+            this.user = {};
+            this.uid = '';
+            this.photoURL = '';
+            this.me = {};
+            console.log('user logout');
+            this.isLogout = false;
+            this.isLogout = true;
+            this.$forceUpdate();
+          })
+          .catch((error) => {
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            // const email = error.customData.email;
+            // The AuthCredential type that was used.
+            // const credential = GoogleAuthProvider.credentialFromError(error);
+            console.log(errorCode);
+            console.log(errorMessage);
+          });
+      }
     },
   },
 });
