@@ -2,32 +2,14 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title> Cart Demo </q-toolbar-title>
         <p class="hidden">{{ isLogout }}</p>
-        <q-btn color="orange" v-show="!uid" @click="loginGoogle()"
-          ><q-icon name="ion-logo-google"></q-icon>Login</q-btn
-        >
-        <q-img
-          loading="eager"
-          class="avatar"
-          v-show="photoURL"
-          alt="photo"
-          referrerpolicy="no-referrer"
-          :src="photoURL"
-          :key="photoURL"
-        ></q-img>
-        <q-btn color="orange" v-show="uid" @click="logout()"
-          ><q-icon name="ion-logo-google"></q-icon>Logout</q-btn
-        >
+        <q-btn color="orange" v-show="!uid" @click="loginGoogle()"><q-icon name="ion-logo-google"></q-icon>Login</q-btn>
+        <q-img loading="eager" class="avatar" v-show="photoURL" alt="photo" referrerpolicy="no-referrer" :src="photoURL"
+          :key="photoURL"></q-img>
+        <q-btn color="orange" v-show="uid" @click="logout()"><q-icon name="ion-logo-google"></q-icon>Logout</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -41,17 +23,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view
-        :me="me"
-        :uid="uid"
-        :email="email"
-        :photoURL="photoURL"
-        :token="token"
-        @addToCart="addToCart"
-        @removeFromCart="removeFromCart"
-        @updateUser="updateUser"
-        :items="items"
-      />
+      <router-view :me="me" :uid="uid" :email="email" :photoURL="photoURL" :token="token" @addToCart="addToCart"
+        @removeFromCart="removeFromCart" @removeAnItemFromCart="removeAnItemFromCart" @updateUser="updateUser"
+        :items="items" />
     </q-page-container>
   </q-layout>
 </template>
@@ -76,7 +50,7 @@ export default defineComponent({
     const inapp = new InApp(navigator.userAgent || navigator.vendor);
     const isInApp = ref(inapp.isInApp);
     const leftDrawerOpen = ref(false);
-    const isLogout = ref<IsLogout>(true);
+    const isLogout = ref(true);
 
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     const obj1: any = {};
@@ -127,11 +101,29 @@ export default defineComponent({
         });
       }
     },
-    removeFromCart(i) {
+    removeAnItemFromCart(i: any) {
       if (!this.uid) {
         window.alert('Please Login at first');
       } else {
-        var arr = (this.cart || this.me.cart || []).filter(function (o) {
+
+        let arr = this.me.cart || [];
+        // 只要移除一個name為i.name的item
+        for (let j = 0; j < arr.length; j++) {
+          if (arr[j].name === i.name) {
+            arr.splice(j, 1);
+            break;
+          }
+        }
+        set(dbRef(db, 'users/' + this.uid + '/cart'), arr).then(() => {
+          console.log('item removed');
+        });
+      }
+    },
+    removeFromCart(i: any) {
+      if (!this.uid) {
+        window.alert('Please Login at first');
+      } else {
+        var arr = (this.me.cart || []).filter(function (o: any) {
           return o.name !== i.name;
         });
         set(dbRef(db, 'users/' + this.uid + '/cart'), arr).then(() => {
@@ -182,7 +174,7 @@ export default defineComponent({
                 const m = snapshot.val();
                 this.me = m;
 
-                set(dbRef(db, 'users/' + this.uid + '/cart'), this.cart);
+                set(dbRef(db, 'users/' + this.uid + '/cart'), this.me.cart || []);
 
                 // this.cart = [...this.me.cart || [] ]; // 取代
 
@@ -192,7 +184,7 @@ export default defineComponent({
                   id: this.uid,
                   email: this.email,
                   photoURL: this.photoURL,
-                  cart: this.cart,
+                  cart: [],
                   logs: [],
                 };
 

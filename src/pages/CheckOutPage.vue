@@ -4,7 +4,7 @@
     <q-list bordered separator>
       <q-item class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
         <q-item-section>
-          {{ i.name }}($NT{{ i.price }})
+          {{ getItemCount(i) }} x {{ i.name }}($NT{{ i.price * getItemCount(i) }})
         </q-item-section>
       </q-item>
     </q-list>
@@ -61,13 +61,15 @@
 
 <script lang='ts'>
 import { defineComponent, ref } from 'vue';
-import { axios } from 'boot/axios'
+import { axios } from '../boot/axios'
 // import InApp from 'detect-inapp';
+
+declare const TPDirect: any;
 
 export default defineComponent({
   name: 'CheckOutPage',
   props: ['me', 'uid', 'email', 'photoURL', 'isLogout', 'token', 'isInApp', 'items'],
-  setup() {
+  setup(props) {
 
     const name = ref('')
     const phone = ref('')
@@ -77,7 +79,17 @@ export default defineComponent({
     const id = ref('')
     const form = ref('')
 
-    return { form, name, phone, email1, addr, zip, id };
+    const getItemCount = (i: any) => {
+      if (!props.uid) {
+        return 0
+      } else {
+        var arr = (props.me.cart || []).filter(function (o: any) {
+          return o.name === i.name
+        })
+        return arr.length
+      }
+    }
+    return { form, name, phone, email1, addr, zip, id, getItemCount };
   },
   mounted() {
     const defaultCardViewStyle = {
@@ -114,7 +126,7 @@ export default defineComponent({
       }
     })
 
-    TPDirect.card.onUpdate(function (update) {
+    TPDirect.card.onUpdate(function (update: any) {
       if (update.canGetPrime) {
         console.log('good!')
       }
@@ -134,29 +146,25 @@ export default defineComponent({
       }
       return ans
     },
-    inCart(i) {
+    inCart(i: any) {
       if (!this.uid) {
         return false
       } else {
-        var arr = (this.me.cart || []).filter(function (o) {
+        var arr = (this.me.cart || []).filter(function (o: any) {
           return o.name === i.name
         })
         return arr.length > 0
       }
     },
-    addToCart(i) {
+    addToCart(i: any) {
       this.$emit('addToCart', i)
-    },
-    ecpay() {
-      window.location = ('https://6093qyw829.execute-api.us-east-1.amazonaws.com/pay?des=EcpayPay_Test&name=Good_Items&amount=' + this.countTotal()
-      )
     },
     pay() {
       if (!this.name || !this.email1 || !this.phone || !this.addr || !this.zip || !this.id) {
         window.alert('請輸入完整的付款資訊')
         return
       }
-      TPDirect.card.getPrime((result) => {
+      TPDirect.card.getPrime((result: any) => {
         if (result.status !== 0) {
           console.error('getPrime error')
           window.alert('請輸入正確的卡號和日期與安全碼')
@@ -189,7 +197,7 @@ export default defineComponent({
             console.log(response);
             if (response.data.msg == 'Success') {
               var logs = (this.me.logs || []).concat(this.me.cart)
-              var cart = []
+              var cart: any[] = []
               this.$emit('updateUser', cart, logs)
               window.alert('交易成功')
             } else {
@@ -208,11 +216,9 @@ export default defineComponent({
 <style type='text/css'>
 #cardview-container {
   color: 'rgb(0,0,0)';
-  fontSize: '15px';
-  lineHeight: '24px';
-  fontWeight: '300';
-  errorColor: 'red';
-  placeholderColor: '';
+  font-size: '15px';
+  line-height: '24px';
+  font-weight: '300';
   width: 400px;
 }
 </style>

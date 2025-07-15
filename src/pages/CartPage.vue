@@ -1,26 +1,24 @@
 <template>
   <q-page>
     <q-list bordered separator>
-      <q-item
-        clickable
-        v-ripple
-        class="my-card"
-        v-for="(i, k) in items"
-        :key="k"
-        v-show="inCart(i)"
-      >
+      <q-item clickable v-ripple class="my-card" v-for="(i, k) in items" :key="k" v-show="inCart(i)">
         <q-item-section>
-          <q-img
-            :src="i.img"
-            style="max-height: 300px; max-width: 400px"
-          ></q-img>
-          {{ i.name }}($NT{{ i.price }})</q-item-section
-        >
+          <q-img :src="i.img" style="max-height: 300px; max-width: 400px"></q-img>
+          {{ i.name }}(單價：$NT{{ i.price }})
+          <div class="q-mt-sm">
+            <div>數量：{{ getItemCount(i) }}</div>
+            <div>小計：$NT{{ getItemCount(i) * i.price }}</div>
+          </div>
+        </q-item-section>
 
-        <q-btn color="red-4" @click="removeFromCart(i)" v-show="inCart(i)">
-          <q-icon name="delete"></q-icon>
-          Remove
-        </q-btn>
+        <q-item-section side>
+          <div class="q-gutter-sm">
+            <q-btn color="primary" size="sm" round @click="addToCart(i)" icon="add" />
+            <q-btn color="orange" size="sm" round @click="decreaseQuantity(i)" icon="remove"
+              :disable="getItemCount(i) <= 1" />
+            <q-btn color="red-4" size="sm" round @click="removeFromCart(i)" icon="delete" />
+          </div>
+        </q-item-section>
       </q-item>
     </q-list>
 
@@ -63,27 +61,39 @@ export default defineComponent({
         return 0;
       }
       for (let k = 0; k < (this.me.cart || []).length; k++) {
-        if (this.inCart(this.me.cart[k])) {
-          ans += this.me.cart[k].price;
-        }
+        ans += this.me.cart[k].price;
       }
       return ans;
     },
-    inCart(i) {
+    inCart(i: any) {
       if (!this.uid) {
         return false;
       } else {
-        var arr = (this.me.cart || []).filter(function (o) {
+        var arr = (this.me.cart || []).filter(function (o: any) {
           return o.name === i.name;
         });
         return arr.length > 0;
       }
     },
-    addToCart(i) {
+    getItemCount(i: any) {
+      if (!this.uid || !this.me) {
+        return 0;
+      }
+      var arr = (this.me.cart || []).filter(function (o: any) {
+        return o.name === i.name;
+      });
+      return arr.length;
+    },
+    addToCart(i: any) {
       this.$emit('addToCart', i);
     },
-    removeFromCart(i) {
+    removeFromCart(i: any) {
       this.$emit('removeFromCart', i);
+    },
+    decreaseQuantity(i: any) {
+      if (this.getItemCount(i) > 1) {
+        this.$emit('removeAnItemFromCart', i);
+      }
     },
     buy() {
       this.$router.push('/checkout');
